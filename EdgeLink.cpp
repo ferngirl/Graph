@@ -227,6 +227,58 @@ public:
 		cout << "NULL" << endl;
 	}
 
+	/////////////////////////最小生成树////////////////////////
+	//顶点必须和图的顶点相同
+	//n个节点，则图有 n-1条边
+	//最小生成树权值最小
+
+//kruskal算法---每次选择权值最小的边，然后判断该边加上后是否构成环（利用并查集）
+	struct complare
+	{
+		bool operator()(EdgeLinkNode<W>* n1, EdgeLinkNode<W>* n2)
+		{
+			if (n1->_weight < n2->_weight)
+				return true;
+			return false;
+		}
+	};
+	bool kruskal(GraphLink<V, W>& g)
+	{
+		g._vertrix = _vertrix;
+		g._isDirection = _isDirection;
+		g._edges.resize(_edges.size());
+
+		vectoe<EdgeLinkNode<W>*> edges;//用来存储各个节点，然后进行排序
+		for (size_t idx = 0; idx < _vertrix.size(); ++idx)
+		{
+			EdgeLinkNode<W>* pCur = _edges[idx];
+			while (pCur)
+			{
+				edges.push(pCur);
+				pCur = pCur->_pNext;
+			}
+		}
+		sort(edges.begin(),edges.end(), complare);
+		size_t count = 1;
+		UnionFindSer ufs(_vertrix.size());
+
+		for (size_t idx = 0; idx < edges.size(); ++idx)
+		{
+			EdgeLinkNode<W>* pCur = edges[idx];
+			if (!ufs.IsSameSet(pCur->_src, pCur->_dst))
+			{
+				g._AddEdge(pCur->_src, pCur->_dst, pCur->_weight);
+				if (_isDirection)
+					g._AddrEdge(pCur->_dst, pCur->_src, pCur->_weight);
+				ufs.Union(pCur->_dst, pCur->_src);
+				count++;
+				if (count == _vertrix.size());
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 private:
 	vector<V> _vertrix;
