@@ -65,7 +65,7 @@ public:
 		}
 	}
 
-	void AddEdge(const V& v1, const V& v2, W weight)
+	void AddEdge(const V& v1, const V& v2, W weight)//图中增加两个节点节点及其边的信息
 	{
 		size_t src = GetIndexOfVeritx(v1);
 		size_t dst = GetIndexOfVeritx(v2);
@@ -73,7 +73,46 @@ public:
 		_AddrEdge(src, dst, weight);
 	}
 
-	void Print()
+	//求出入度和出度
+	pair<int,int> GetDev(const V& v)
+	{
+		size_t inCount = 0;
+		size_t outCount = 0;
+
+		size_t index = GetIndexOfVeritx(v);
+		EdgeLinkNode<W>* pCur = _edges[index];
+		while (pCur)
+		{
+			outCount++;
+			pCur = pCur->_pNext;
+		}
+		if (_isDirection)//无向图入度等于出度
+		{
+			inCount = outCount;
+		}
+		
+		if (!_isDirection)//有向图的情况下，要单独求出出度
+		{
+			for (size_t idx = 0; idx < _vertrix.size(); ++idx)
+			{
+				pCur = _edges[idx];
+				if (pCur && pCur->_dst == index)
+					continue;
+				while (pCur)
+				{
+					if (pCur->_dst == index)
+					{
+						inCount++;
+						break;
+					}
+					pCur = pCur->_pNext;
+				}
+			}
+		}
+		return make_pair(inCount, outCount);
+	}
+
+	void Print()//压印图
 	{
 		for (size_t idx = 0; idx < _edges.size(); ++idx)
 		{
